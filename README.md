@@ -3,7 +3,8 @@
 
 Vortex is a powerful, intelligent desktop manager that automatically categorizes and organizes your files using AI. It keeps your workspace clean so you can focus on what matters.
 
-![Vortex UI](https://via.placeholder.com/800x400?text=Vortex+UI+Preview) *(Add a screenshot here!)*
+<img width="1097" height="746" alt="image" src="https://github.com/user-attachments/assets/b37f46ff-ff93-4a44-a960-f7e7f54b8b9e" />
+
 
 ## ✨ Features
 
