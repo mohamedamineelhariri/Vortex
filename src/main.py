@@ -1,6 +1,8 @@
 import time
 import yaml
 import sys
+import datetime
+import json
 from pathlib import Path
 
 # Add project root to sys.path to allow running as script
@@ -99,6 +101,21 @@ class AntigravitySystem:
             logger.info(f"Skipping unsafe or ignored file: {file_path}")
             return
 
+        # 1.5 Type Filter (Files / Shortcuts / Folders)
+        targets = self.config.get("organization_targets", {"files": True, "shortcuts": True, "folders": True})
+        is_dir = Path(file_path).is_dir()
+        is_shortcut = file_path.lower().endswith(".lnk")
+
+        if is_dir and not targets.get("folders"):
+            logger.info(f"Skipping folder: {file_path}")
+            return
+        if is_shortcut and not targets.get("shortcuts"):
+            logger.info(f"Skipping shortcut: {file_path}")
+            return
+        if not is_dir and not is_shortcut and not targets.get("files"):
+            logger.info(f"Skipping file: {file_path}")
+            return
+
         self.stats["files_processed"] += 1
         if self.on_stats_change:
             self.on_stats_change(self.stats)
@@ -138,8 +155,16 @@ class AntigravitySystem:
 
         logger.info(f"Evaluating decision (Confidence: {confidence}). Mode: {current_mode}")
 
+        # Apply Date Prefix [YYYY-MM-DD]
+        creation_time = Path(source_path).stat().st_ctime
+        date_str = datetime.datetime.fromtimestamp(creation_time).strftime('%Y-%m-%d')
+        date_prefix = f"[{date_str}] "
+        
         target_folder = folder
-        target_name = suggested_name
+        if suggested_name and not suggested_name.startswith("["):
+            target_name = f"{date_prefix}{suggested_name}"
+        else:
+            target_name = suggested_name
 
         # Safety Check (Destination)
         if not self.safety.is_safe_action(source_path, str(Path(self.config["safe_root"]) / target_folder)):

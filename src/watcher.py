@@ -24,13 +24,9 @@ class AntigravityHandler(FileSystemEventHandler):
         return False
 
     def on_created(self, event):
-        if event.is_directory:
-            return
         self._process_event(event)
 
     def on_modified(self, event):
-        if event.is_directory:
-            return
         self._process_event(event)
 
     def _process_event(self, event):

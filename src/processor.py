@@ -2,6 +2,14 @@ import os
 import datetime
 from pathlib import Path
 
+# Windows specific for shortcuts
+try:
+    import win32com.client
+    import pythoncom
+    HAS_PYWIN32 = True
+except ImportError:
+    HAS_PYWIN32 = False
+
 class FileProcessor:
     def __init__(self, config):
         self.config = config
@@ -13,13 +21,28 @@ class FileProcessor:
             return None
 
         stat = path.stat()
-        return {
+        metadata = {
             "filename": path.name,
             "extension": path.suffix.lower(),
             "created_at": datetime.datetime.fromtimestamp(stat.st_ctime).strftime('%Y-%m-%d'),
             "size_bytes": stat.st_size,
-            "path": str(path.absolute())
+            "path": str(path.absolute()),
+            "is_directory": path.is_dir()
         }
+
+        # Resolve shortcuts on Windows
+        if HAS_PYWIN32 and path.suffix.lower() == '.lnk':
+            try:
+                pythoncom.CoInitialize()
+                shell = win32com.client.Dispatch("WScript.Shell")
+                shortcut = shell.CreateShortCut(str(path.absolute()))
+                metadata["shortcut_target"] = shortcut.Targetpath
+            except Exception:
+                pass
+            finally:
+                pythoncom.CoUninitialize()
+
+        return metadata
 
     def extract_excerpt(self, file_path):
         path = Path(file_path)
