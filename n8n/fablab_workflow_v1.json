@@ -1,0 +1,86 @@
+{
+    "name": "Vortex Brain (FabLab Edition)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "antigravity/decision",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "chat",
+                "model": "gpt-4-turbo",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "user",
+                            "content": "={{ \"You are the Librarian of a FabLab (Makerspace).\\n\\nYour Goal: Organize files on a SHARED computer used by many students.\\n\\nRules:\\n1. PROJECT GROUPING IS CRITICAL. If you see 'drone_arm.stl' and 'drone_prop.stl', put them in 'Projects/Drone'.\\n2. If a file is generic (e.g. 'box.dxf'), categorize by Technology: 'Laser_Cutting', '3D_Printing', 'CNC', 'Electronics'.\\n3. Cleanup filenames: 'Part 1 (final) v2.stl' -> 'Part_1_Final_v2.stl'\\n\\nInput File:\\n\" + JSON.stringify($json.body) + \"\\n\\nOUTPUT JSON ONLY:\\n{\\n  \\\"category\\\": \\\"3D_Printing\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"suggested_name\\\": \\\"cleaned_filename.ext\\\",\\n  \\\"folder\\\": \\\"3D_Printing/Project_Name\\\" OR \\\"Laser_Cutting/Material_Type\\\",\\n  \\\"tags\\\": [\\\"PLA\\\", \\\"Laser\\\", \\\"Arduino\\\"]\\n}\" }}"
+                        }
+                    ]
+                },
+                "jsonOutput": false
+            },
+            "name": "FabLab AI",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                680,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "YOUR_CREDENTIAL_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ $json.message.content }}",
+                "options": {}
+            },
+            "name": "Respond to Vortex",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "FabLab AI",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "FabLab AI": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Vortex",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

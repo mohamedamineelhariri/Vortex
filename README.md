@@ -52,6 +52,14 @@ Vortex is a powerful, intelligent desktop manager that automatically categorizes
     python src/ui/gui_main.py
     ```
 
+## 🏭 FabLab / Makerspace Edition
+**Vortex** is capable of running on shared institution machines.
+
+### Features
+*   **CAD/CAM Support**: Recognizes `.stl`, `.obj`, `.dxf`, `.gcode`, `.ino` and more.
+*   **Project Grouping**: Designed for shared users. It attempts to group files into Project folders rather than generic timestamps.
+*   **Setup**: Import `n8n/fablab_workflow_v1.json` for the specialized logic.
+
 ## 🎮 Usage
 
 *   **Quick Scan**: Scans existing files on your Desktop/Downloads and queues them for review.
