@@ -1,0 +1,86 @@
+{
+    "name": "Antigravity Brain V5 (Raw String Fix)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "antigravity/decision",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "chat",
+                "model": "gpt-4-turbo",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "user",
+                            "content": "={{ \"You are the Antigravity Brain, a strict digital organizer.\\n\\nYour Goal: Classify the input file and suggest a clean, organized path.\\n\\nRules:\\n1. Use underscores for filenames.\\n2. Keep original extension.\\n3. Be confident (>0.8) only if sure.\\n4. Folder must start with one of the Categories: Documents|Images|Videos|Audio|Archives|Code|Other.\\n5. If uncertain, use folder \\\"Other/Unsorted\\\" and confidence 0.5.\\n\\nInput:\\n\" + JSON.stringify($json.body) + \"\\n\\nOutput:\\nSTRICT JSON ONLY. No markdown. No ```json blocks.\\n{\\n  \\\"category\\\": \\\"string\\\",\\n  \\\"confidence\\\": 0.0,\\n  \\\"suggested_name\\\": \\\"string\\\",\\n  \\\"folder\\\": \\\"string\\\",\\n  \\\"tags\\\": [\\\"string\\\"]\\n}\" }}"
+                        }
+                    ]
+                },
+                "jsonOutput": false
+            },
+            "name": "Analyze File",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                680,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "YOUR_CREDENTIAL_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ $json.message.content }}",
+                "options": {}
+            },
+            "name": "Respond to Agent",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Analyze File",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Analyze File": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

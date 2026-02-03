@@ -1,0 +1,86 @@
+{
+    "name": "Antigravity Brain V6 (Robust Prompt)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "antigravity/decision",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "chat",
+                "model": "gpt-4-turbo",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "user",
+                            "content": "={{ \"You are Antigravity. Organize this file.\\n\\nRules:\\n1. Underscores for spaces.\\n2. Keep extension.\\n3. High confidence (>0.8) only if sure.\\n4. Categories: Documents|Images|Videos|Audio|Archives|Code|Other.\\n\\nFile Input:\\n\" + JSON.stringify($json.body) + \"\\n\\nOutput STRICT JSON:\\n{\\n  \\\"category\\\": \\\"Category\\\",\\n  \\\"confidence\\\": 0.9,\\n  \\\"suggested_name\\\": \\\"new_name.ext\\\",\\n  \\\"folder\\\": \\\"Category/Subfolder\\\",\\n  \\\"tags\\\": [\\\"tag\\\"]\\n}\" }}"
+                        }
+                    ]
+                },
+                "jsonOutput": false
+            },
+            "name": "Analyze File",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                680,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "YOUR_CREDENTIAL_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ $json.message.content }}",
+                "options": {}
+            },
+            "name": "Respond to Agent",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Analyze File",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Analyze File": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

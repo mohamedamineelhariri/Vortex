@@ -1,0 +1,224 @@
+/* VORTEX - Deep Space Theme */
+
+QMainWindow {
+    background-color: transparent;
+}
+
+#CentralWidget {
+    background-color: #11111b; /* Crust */
+    border-radius: 10px;
+    border: 1px solid #313244;
+}
+
+QWidget {
+    font-family: 'Segoe UI', sans-serif;
+    color: #cdd6f4;
+}
+
+/* Header */
+#Header {
+    background-color: #181825; /* Mantle */
+    border-bottom: 2px solid #313244;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#AppTitle {
+    font-size: 28px;
+    font-weight: 800;
+    color: #cba6f7; /* Mauve */
+    letter-spacing: 2px;
+    padding-bottom: 0px;
+    margin-bottom: 5px; /* Push subtitle down */
+}
+
+#AppSubtitle {
+    font-size: 12px;
+    color: #a6adc8;
+}
+
+#StatusDot {
+    font-size: 20px;
+}
+
+#StatusLabel {
+    font-size: 14px;
+    font-weight: bold;
+    color: #a6adc8;
+}
+
+/* Window Controls */
+/* Window Controls */
+#BtnWinMin {
+    background-color: transparent;
+    border: none;
+    color: #89b4fa; /* Blue */
+    font-weight: 900;
+    font-size: 16px;
+}
+#BtnWinMin:hover {
+    color: #b4befe; /* Lighter Blue */
+}
+
+#BtnWinClose {
+    background-color: transparent;
+    border: none;
+    color: #f38ba8; /* Red */
+    font-weight: 900;
+    font-size: 16px;
+}
+#BtnWinClose:hover {
+    color: #eba0ac; /* Lighter Red */
+}
+
+/* Hero Section */
+#HeroSection {
+    background-color: #11111b;
+}
+
+#BtnScan {
+    background-color: #89b4fa; /* Blue */
+    color: #11111b;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+}
+#BtnScan:hover {
+    background-color: #74c7ec; /* Sapphire */
+}
+
+#BtnPilot {
+    background-color: #1e1e2e;
+    color: #89b4fa;
+    border: 2px solid #89b4fa;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+}
+#BtnPilot:hover {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+}
+
+#ModeSelect {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    border: 2px solid #313244;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+#ModeSelect::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left-width: 0px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+#ModeSelect::down-arrow {
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #89b4fa; /* Blue Arrow */
+    margin-right: 5px;
+}
+#ModeSelect QAbstractItemView {
+    background-color: #181825;
+    color: #cdd6f4;
+    selection-background-color: #313244;
+    selection-color: #cdd6f4;
+    border: 1px solid #313244;
+}
+
+/* Content */
+#SectionTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #bac2de;
+    margin-bottom: 10px;
+}
+
+#BtnUndo {
+    background-color: transparent;
+    color: #fab387; /* Peach */
+    border: 1px solid #fab387;
+    border-radius: 4px;
+    font-weight: bold;
+}
+#BtnUndo:hover {
+    background-color: #fab387;
+    color: #11111b;
+}
+
+/* Table */
+QTableWidget {
+    background-color: #1e1e2e;
+    border: none;
+    border-radius: 10px;
+    gridline-color: transparent;
+}
+QTableWidget::item {
+    padding-left: 10px;
+    border-bottom: 1px solid #313244;
+}
+QHeaderView::section {
+    background-color: #1e1e2e;
+    color: #6c7086;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    padding: 10px;
+}
+
+/* Action Buttons */
+#BtnApprove {
+    background-color: #313244;
+    color: #a6e3a1; /* Green */
+    border-radius: 20px;
+    font-size: 18px;
+    border: 2px solid #a6e3a1;
+}
+#BtnApprove:hover {
+    background-color: #a6e3a1;
+    color: #11111b;
+}
+
+#BtnReject {
+    background-color: #313244;
+    color: #f38ba8; /* Red */
+    border-radius: 20px;
+    font-size: 18px;
+    border: 2px solid #f38ba8;
+}
+#BtnReject:hover {
+    background-color: #f38ba8;
+    color: #11111b;
+}
+
+/* Footer / Logs */
+#Footer {
+    background-color: #11111b;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#BtnToggleLogs {
+    background-color: transparent;
+    color: #585b70;
+    border: none;
+}
+#BtnToggleLogs:hover {
+    color: #cdd6f4;
+}
+
+#Console {
+    background-color: #181825;
+    border: 1px solid #313244;
+    border-radius: 5px;
+    color: #a6adc8;
+    font-family: 'Consolas', monospace;
+    font-size: 11px;
+}

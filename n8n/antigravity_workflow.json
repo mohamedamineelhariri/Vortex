@@ -1,0 +1,89 @@
+{
+    "name": "Antigravity Brain",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "antigravity/decision",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                460,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "model": "gpt-4-turbo-preview",
+                "messages": {
+                    "values": [
+                        {
+                            "role": "system",
+                            "content": "You are the Antigravity Brain, a strict digital organizer.\n\nYour Goal: Classify the input file and suggest a clean, organized path.\n\nInput:\nJSON with filename, extension, created_at, text_excerpt.\n\nOutput:\nSTRICT JSON ONLY. No markdown.\n{\n  \"category\": \"string (Documents|Images|Videos|Audio|Archives|Code|Other)\",\n  \"confidence\": 0.0 to 1.0,\n  \"suggested_name\": \"clean_filename_with_extension\",\n  \"folder\": \"Category/Subcategory\",\n  \"tags\": [\"tag1\", \"tag2\"]\n}\n\nRules:\n1. Use underscores for filenames.\n2. Keep original extension.\n3. Be confident (>0.8) only if sure.\n4. Folder must start with one of the Categories.\n5. If uncertain, use folder \"Other/Unsorted\" and confidence 0.5."
+                        },
+                        {
+                            "role": "user",
+                            "content": "={{ JSON.stringify($json.body) }}"
+                        }
+                    ]
+                },
+                "jsonOutput": true
+            },
+            "name": "Analyze File",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                680,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "YOUR_CREDENTIAL_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ $json.message.content }}",
+                "options": {}
+            },
+            "name": "Respond to Agent",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Analyze File",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Analyze File": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

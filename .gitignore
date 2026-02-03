@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# Project Specific
+config.yaml
+*.log
+undo_log.json
+brain/
+artifacts/
+
+# System
+Thumbs.db
+desktop.ini
