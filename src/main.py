@@ -59,6 +59,10 @@ class AntigravitySystem:
             self.mode = mode
             logger.info(f"Mode changed to: {self.mode}")
 
+    def update_config(self, key, value):
+        self.config[key] = value
+        logger.info(f"Configuration updated: {key} = {value}")
+
     def undo_last(self):
         result = self.executor.undo_last_action()
         if result:
@@ -76,16 +80,28 @@ class AntigravitySystem:
             self.on_pending_change(self.pending_actions)
             
         # Execute
-        new_path = self.executor.move_file(
-            action['source_path'], 
-            action['target_folder'], 
-            action['target_name']
-        )
-        if new_path:
-             logger.info(f"Action executed: Moved to {new_path}")
-             self.stats["actions_taken"] += 1
-             if self.on_stats_change:
-                 self.on_stats_change(self.stats)
+        source_path = action['source_path']
+        is_shortcut = source_path.lower().endswith(".lnk")
+        behavior = self.config.get("shortcuts_behavior", "move")
+
+        if is_shortcut and behavior == "reposition":
+            success = self.executor.reposition_icon(source_path, action.get('category', 'Other'))
+            if success:
+                logger.info(f"Action executed: Shortcut repositioned on Desktop.")
+                self.stats["actions_taken"] += 1
+                if self.on_stats_change:
+                    self.on_stats_change(self.stats)
+        else:
+            new_path = self.executor.move_file(
+                source_path, 
+                action['target_folder'], 
+                action['target_name']
+            )
+            if new_path:
+                logger.info(f"Action executed: Moved to {new_path}")
+                self.stats["actions_taken"] += 1
+                if self.on_stats_change:
+                    self.on_stats_change(self.stats)
 
     def reject_action(self, action_id):
         if self.pending_actions.pop(action_id, None):
@@ -155,16 +171,31 @@ class AntigravitySystem:
 
         logger.info(f"Evaluating decision (Confidence: {confidence}). Mode: {current_mode}")
 
-        # Apply Date Prefix [YYYY-MM-DD]
-        creation_time = Path(source_path).stat().st_ctime
-        date_str = datetime.datetime.fromtimestamp(creation_time).strftime('%Y-%m-%d')
-        date_prefix = f"[{date_str}] "
-        
+        # Apply Naming Rules
+        is_shortcut = source_path.lower().endswith(".lnk")
         target_folder = folder
-        if suggested_name and not suggested_name.startswith("["):
-            target_name = f"{date_prefix}{suggested_name}"
+        
+        if is_shortcut:
+            # Shortcut Branding: [Category]-Name.lnk
+            category = decision.get("category", "Other")
+            clean_name = suggested_name if suggested_name else Path(source_path).name
+            if not clean_name.startswith("["):
+                target_name = f"[{category}]-{clean_name}"
+            else:
+                target_name = clean_name
+            
+            # KEEP ON DESKTOP (Root of Safe Root)
+            target_folder = "" 
         else:
-            target_name = suggested_name
+            # Regular File Branding: [YYYY-MM-DD] Name
+            creation_time = Path(source_path).stat().st_ctime
+            date_str = datetime.datetime.fromtimestamp(creation_time).strftime('%Y-%m-%d')
+            date_prefix = f"[{date_str}] "
+            
+            if suggested_name and not suggested_name.startswith("["):
+                target_name = f"{date_prefix}{suggested_name}"
+            else:
+                target_name = suggested_name if suggested_name else Path(source_path).name
 
         # Safety Check (Destination)
         if not self.safety.is_safe_action(source_path, str(Path(self.config["safe_root"]) / target_folder)):
@@ -179,16 +210,21 @@ class AntigravitySystem:
             self._action_counter += 1
             action_id = self._action_counter
             
+            # Format display path for UI
+            display_target = f"{target_folder}/{target_name}"
+
             self.pending_actions[action_id] = {
                 "id": action_id,
                 "source_path": source_path,
                 "target_folder": target_folder,
                 "target_name": target_name,
+                "display_target": display_target,
                 "confidence": confidence,
+                "category": decision.get("category", "Other"),
                 "filename": Path(source_path).name
             }
             
-            logger.info(f"[SUGGEST] Action {action_id} queued: {source_path} -> {target_folder}")
+            logger.info(f"[SUGGEST] Action {action_id} queued: {source_path} -> {display_target}")
             
             if self.on_pending_change:
                 self.on_pending_change(self.pending_actions)
@@ -196,13 +232,22 @@ class AntigravitySystem:
 
         if current_mode == "auto":
             if confidence >= self.confidence_threshold:
-                logger.info(f"[AUTO] Executing move...")
-                new_path = self.executor.move_file(source_path, target_folder, target_name)
-                if new_path:
-                    logger.info(f"Generic Success: File moved to {new_path}")
-                    self.stats["actions_taken"] += 1
-                    if self.on_stats_change:
-                        self.on_stats_change(self.stats)
+                logger.info(f"[AUTO] Executing action...")
+                
+                is_shortcut = source_path.lower().endswith(".lnk")
+                behavior = self.config.get("shortcuts_behavior", "move")
+
+                if is_shortcut and behavior == "reposition":
+                    success = self.executor.reposition_icon(source_path, decision.get("category", "Other"))
+                    if success:
+                         self.stats["actions_taken"] += 1
+                else:
+                    new_path = self.executor.move_file(source_path, target_folder, target_name)
+                    if new_path:
+                        self.stats["actions_taken"] += 1
+                
+                if self.on_stats_change:
+                    self.on_stats_change(self.stats)
             else:
                 logger.info(f"[AUTO] Confidence {confidence} too low (Threshold: {self.confidence_threshold}). Action skipped.")
 

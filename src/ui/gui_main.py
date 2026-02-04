@@ -90,6 +90,10 @@ class AntigravityWorker(QObject):
     def reject_action(self, action_id):
         self.system.reject_action(action_id)
 
+    @pyqtSlot(dict)
+    def update_targets(self, targets):
+        self.system.update_config("organization_targets", targets)
+
 # --- Main Application ---
 def main():
     app = QApplication(sys.argv)
@@ -129,6 +133,7 @@ def main():
     window.undo_requested.connect(worker.undo_last)
     window.approve_requested.connect(worker.approve_action)
     window.reject_requested.connect(worker.reject_action)
+    window.targets_changed.connect(worker.update_targets)
     
     # Connect Logging to Console
     signaler.message_emitted.connect(window.log)

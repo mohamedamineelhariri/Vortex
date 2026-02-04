@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QListWidget, QFrame, QComboBox, 
     QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView,
-    QSizePolicy
+    QSizePolicy, QCheckBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QIcon, QFont
@@ -16,6 +16,7 @@ class Dashboard(QMainWindow):
     undo_requested = pyqtSignal()
     approve_requested = pyqtSignal(int)
     reject_requested = pyqtSignal(int)
+    targets_changed = pyqtSignal(dict) # {files: bool, shortcuts: bool, folders: bool}
 
     def __init__(self):
         super().__init__()
@@ -38,6 +39,9 @@ class Dashboard(QMainWindow):
         
         # 2. Hero Section (Controls)
         self._setup_hero()
+
+        # 2.5 Target Toggles
+        self._setup_toggles()
         
         # 3. Content Area (Table)
         self._setup_content()
@@ -150,6 +154,42 @@ class Dashboard(QMainWindow):
         layout.addWidget(self.btn_pilot)
         
         self.main_layout.addWidget(hero)
+
+    def _setup_toggles(self):
+        container = QFrame()
+        container.setObjectName("TogglesSection")
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(35, 5, 30, 15)
+        layout.setSpacing(25)
+
+        label = QLabel("ORGANIZATION TARGETS:")
+        label.setStyleSheet("color: #6c7086; font-weight: bold; font-size: 11px;")
+        
+        self.check_files = QCheckBox("Files")
+        self.check_shortcuts = QCheckBox("Shortcuts (.lnk)")
+        self.check_folders = QCheckBox("Folders")
+        
+        # Set defaults
+        self.check_files.setChecked(True)
+        self.check_shortcuts.setChecked(True)
+        self.check_folders.setChecked(True)
+
+        for cb in [self.check_files, self.check_shortcuts, self.check_folders]:
+            cb.stateChanged.connect(self._emit_targets)
+            layout.addWidget(cb)
+
+        layout.insertWidget(0, label)
+        layout.addStretch()
+        
+        self.main_layout.addWidget(container)
+
+    def _emit_targets(self):
+        targets = {
+            "files": self.check_files.isChecked(),
+            "shortcuts": self.check_shortcuts.isChecked(),
+            "folders": self.check_folders.isChecked()
+        }
+        self.targets_changed.emit(targets)
 
     def _setup_content(self):
         content = QWidget()
@@ -264,7 +304,7 @@ class Dashboard(QMainWindow):
     def update_pending_actions(self, pending_dict):
         self.table.setRowCount(0)
         
-        for action_id, data in pending_dict.items():
+        for action_id, data in list(pending_dict.items()):
             row = self.table.rowCount()
             self.table.insertRow(row)
             self.table.setRowHeight(row, 60)
@@ -281,8 +321,13 @@ class Dashboard(QMainWindow):
             self.table.setItem(row, 1, item_conf)
             
             # Path
-            path_str = f"{data['target_folder']}/{data['target_name']}"
-            item_path = QTableWidgetItem(path_str)
+            display_path = data.get('display_target', f"{data['target_folder']}/{data['target_name']}")
+            item_path = QTableWidgetItem(display_path)
+            
+            # Highlight branded shortcuts in Yellow-Gold for visibility
+            if "[" in data['target_name'] and not data['filename'].startswith("["):
+                 item_path.setForeground(Qt.GlobalColor.yellow)
+                 
             self.table.setItem(row, 2, item_path)
             
             # Actions

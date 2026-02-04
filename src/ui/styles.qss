@@ -222,3 +222,35 @@ QHeaderView::section {
     font-family: 'Consolas', monospace;
     font-size: 11px;
 }
+
+/* Toggles Section */
+#TogglesSection {
+    background-color: transparent;
+}
+
+QCheckBox {
+    spacing: 8px;
+    color: #a6adc8; /* Subtext0 */
+    font-size: 13px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background-color: #313244;
+    border: 1px solid #45475a;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #cba6f7; /* Mauve */
+    border: 1px solid #cba6f7;
+}
+
+QCheckBox::indicator:hover {
+    border: 1px solid #585b70;
+}
+
+QCheckBox:hover {
+    color: #cdd6f4;
+}
