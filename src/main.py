@@ -198,7 +198,8 @@ class AntigravitySystem:
                 target_name = suggested_name if suggested_name else Path(source_path).name
 
         # Safety Check (Destination)
-        if not self.safety.is_safe_action(source_path, str(Path(self.config["safe_root"]) / target_folder)):
+        dest_check = str(Path(self.config["safe_root"]) / target_folder) if target_folder else self.config["safe_root"]
+        if not self.safety.is_safe_action(source_path, dest_check):
              logger.error(f"Unsafe destination rejected: {target_folder}")
              return
 
@@ -210,8 +211,11 @@ class AntigravitySystem:
             self._action_counter += 1
             action_id = self._action_counter
             
-            # Format display path for UI
-            display_target = f"{target_folder}/{target_name}"
+            # Format display path for UI (no leading slash when on desktop root)
+            if target_folder:
+                display_target = f"{target_folder}/{target_name}"
+            else:
+                display_target = f"Desktop: {target_name}"
 
             self.pending_actions[action_id] = {
                 "id": action_id,
@@ -276,8 +280,14 @@ class AntigravitySystem:
             logger.info("Agent stopped.")
 
     def scan_existing_files(self):
-        """Scans all existing files in watched paths."""
+        """Scans all existing files in watched paths. Clears previous results first."""
         logger.info("Starting manual scan of existing files...")
+        
+        # Clear previous scan results
+        self.pending_actions.clear()
+        self._action_counter = 0
+        if self.on_pending_change:
+            self.on_pending_change(self.pending_actions)
         
         paths = self.config.get("watch_paths", [])
         count = 0

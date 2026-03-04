@@ -2,10 +2,11 @@ from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QListWidget, QFrame, QComboBox, 
     QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView,
-    QSizePolicy, QCheckBox
+    QSizePolicy, QCheckBox, QLineEdit
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QIcon, QFont
+import requests
 
 class Dashboard(QMainWindow):
     # Signals
@@ -16,7 +17,8 @@ class Dashboard(QMainWindow):
     undo_requested = pyqtSignal()
     approve_requested = pyqtSignal(int)
     reject_requested = pyqtSignal(int)
-    targets_changed = pyqtSignal(dict) # {files: bool, shortcuts: bool, folders: bool}
+    targets_changed = pyqtSignal(dict)
+    ai_changed = pyqtSignal(dict)    # {provider, model, api_key}
 
     def __init__(self):
         super().__init__()
@@ -40,7 +42,10 @@ class Dashboard(QMainWindow):
         # 2. Hero Section (Controls)
         self._setup_hero()
 
-        # 2.5 Target Toggles
+        # 2.5 AI Model Selector
+        self._setup_ai_selector()
+
+        # 2.7 Target Toggles
         self._setup_toggles()
         
         # 3. Content Area (Table)
@@ -155,6 +160,93 @@ class Dashboard(QMainWindow):
         
         self.main_layout.addWidget(hero)
 
+    def _setup_ai_selector(self):
+        """AI provider + model selector panel."""
+        container = QFrame()
+        container.setObjectName("AISection")
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(35, 8, 30, 8)
+        layout.setSpacing(16)
+
+        lbl = QLabel("AI ENGINE:")
+        lbl.setStyleSheet("color: #45475a; font-weight: 700; font-size: 11px; letter-spacing: 1.5px;")
+
+        # Provider selector
+        self.combo_provider = QComboBox()
+        self.combo_provider.setObjectName("ModeSelect")
+        self.combo_provider.addItems(["openai", "ollama"])
+        self.combo_provider.setFixedSize(110, 34)
+        self.combo_provider.currentTextChanged.connect(self._on_provider_changed)
+
+        # Model selector
+        self._openai_models = ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        self._ollama_curated = ["phi4", "qwen2.5:7b", "llama3.2", "llama3.1:8b", "mistral", "deepseek-coder-v2"]
+        self.combo_model = QComboBox()
+        self.combo_model.setObjectName("ModeSelect")
+        self.combo_model.addItems(self._openai_models)
+        self.combo_model.setFixedSize(160, 34)
+        self.combo_model.currentTextChanged.connect(self._emit_ai_config)
+
+        # API Key field (only for OpenAI)
+        self.api_key_input = QLineEdit()
+        self.api_key_input.setObjectName("ApiKeyInput")
+        self.api_key_input.setPlaceholderText("OpenAI API Key  (sk-...)")
+        self.api_key_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.api_key_input.setFixedHeight(34)
+        self.api_key_input.setMinimumWidth(240)
+        self.api_key_input.textChanged.connect(self._emit_ai_config)
+
+        # Ollama detect button
+        self.btn_detect = QPushButton("⟳ Detect")
+        self.btn_detect.setObjectName("BtnDetect")
+        self.btn_detect.setFixedSize(80, 34)
+        self.btn_detect.setToolTip("Auto-detect installed Ollama models")
+        self.btn_detect.setVisible(False)
+        self.btn_detect.clicked.connect(self._detect_ollama_models)
+
+        layout.addWidget(lbl)
+        layout.addWidget(self.combo_provider)
+        layout.addWidget(self.combo_model)
+        layout.addWidget(self.api_key_input)
+        layout.addWidget(self.btn_detect)
+        layout.addStretch()
+
+        self.main_layout.addWidget(container)
+
+    def _on_provider_changed(self, provider):
+        if provider == "openai":
+            self.combo_model.clear()
+            self.combo_model.addItems(self._openai_models)
+            self.api_key_input.setVisible(True)
+            self.btn_detect.setVisible(False)
+        else:
+            self.combo_model.clear()
+            self.combo_model.addItems(self._ollama_curated)
+            self.api_key_input.setVisible(False)
+            self.btn_detect.setVisible(True)
+            # Try auto-detect on switch
+            self._detect_ollama_models()
+        self._emit_ai_config()
+
+    def _detect_ollama_models(self):
+        """Query Ollama for installed models and update combo."""
+        try:
+            r = requests.get("http://localhost:11434/api/tags", timeout=3)
+            if r.status_code == 200:
+                models = [m["name"] for m in r.json().get("models", [])]
+                if models:
+                    self.combo_model.clear()
+                    self.combo_model.addItems(models)
+        except Exception:
+            pass  # Ollama not running, keep curated list
+
+    def _emit_ai_config(self):
+        self.ai_changed.emit({
+            "provider": self.combo_provider.currentText(),
+            "model": self.combo_model.currentText(),
+            "api_key": self.api_key_input.text().strip()
+        })
+
     def _setup_toggles(self):
         container = QFrame()
         container.setObjectName("TogglesSection")
@@ -211,24 +303,29 @@ class Dashboard(QMainWindow):
         top_bar.addWidget(self.btn_undo)
         layout.addLayout(top_bar)
         
-        # Table
+        # Table — alternatingRowColors handled purely by QSS ::item and ::item:alternate
         self.table = QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["FILE", "CONFIDENCE", "SUGGESTED PATH", "ACTIONS"])
-        self.table.setShowGrid(False)
-        self.table.setAlternatingRowColors(True)
+        self.table.setHorizontalHeaderLabels(["FILE", "CONF", "DESTINATION", "ACTION"])
+        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        self.table.setSortingEnabled(True)
+        self.table.horizontalHeader().setSortIndicatorShown(True)
+        self.table.setShowGrid(False)
+        self.table.setAlternatingRowColors(False)
         self.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.table.verticalHeader().setVisible(False)
-        
-        # Header sizing
+        self.table.setWordWrap(False)
+
+        # Column sizing
         header = self.table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
-        self.table.setColumnWidth(3, 150)
-        
+        self.table.setColumnWidth(1, 70)
+        self.table.setColumnWidth(3, 120)
+
         layout.addWidget(self.table)
         self.main_layout.addWidget(content)
 

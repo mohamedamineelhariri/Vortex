@@ -94,6 +94,16 @@ class AntigravityWorker(QObject):
     def update_targets(self, targets):
         self.system.update_config("organization_targets", targets)
 
+    @pyqtSlot(dict)
+    def update_ai_config(self, ai_cfg):
+        self.system.update_config("ai_provider", ai_cfg.get("provider", "openai"))
+        self.system.update_config("ai_model",    ai_cfg.get("model", "gpt-4o-mini"))
+        if ai_cfg.get("api_key"):
+            self.system.update_config("openai_api_key", ai_cfg["api_key"])
+        # Recreate brain client with new settings
+        from src.brain_client import BrainClient
+        self.system.brain = BrainClient(self.system.config)
+
 # --- Main Application ---
 def main():
     app = QApplication(sys.argv)
@@ -101,7 +111,7 @@ def main():
     # Load Styles
     style_path = Path(__file__).parent / "styles.qss"
     if style_path.exists():
-        with open(style_path, "r") as f:
+        with open(style_path, "r", encoding="utf-8") as f:
             app.setStyleSheet(f.read())
     
     # Setup Signal Bridge for Logging
@@ -134,6 +144,7 @@ def main():
     window.approve_requested.connect(worker.approve_action)
     window.reject_requested.connect(worker.reject_action)
     window.targets_changed.connect(worker.update_targets)
+    window.ai_changed.connect(worker.update_ai_config)
     
     # Connect Logging to Console
     signaler.message_emitted.connect(window.log)

@@ -1,256 +1,362 @@
-/* VORTEX - Deep Space Theme */
+/* ══════════════════════════════════════════════════
+   VORTEX  —  Deep Space UI Theme  v2.0
+   Palette: Catppuccin Mocha
+   ══════════════════════════════════════════════════ */
 
+/* ─── Base ──────────────────────────────────────── */
 QMainWindow {
     background-color: transparent;
 }
 
 #CentralWidget {
-    background-color: #11111b; /* Crust */
-    border-radius: 10px;
-    border: 1px solid #313244;
+    background-color: #0f0f17;
+    border-radius: 12px;
+    border: 1px solid #2a2a3d;
 }
 
 QWidget {
     font-family: 'Segoe UI', sans-serif;
+    font-size: 13px;
     color: #cdd6f4;
+    background-color: transparent;
 }
 
-/* Header */
+/* ─── Header ────────────────────────────────────── */
 #Header {
-    background-color: #181825; /* Mantle */
-    border-bottom: 2px solid #313244;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    background-color: #13131f;
+    border-bottom: 1px solid #2a2a3d;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
 
 #AppTitle {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
-    color: #cba6f7; /* Mauve */
-    letter-spacing: 2px;
-    padding-bottom: 0px;
-    margin-bottom: 5px; /* Push subtitle down */
+    color: #cba6f7;
+    letter-spacing: 4px;
 }
 
 #AppSubtitle {
-    font-size: 12px;
-    color: #a6adc8;
+    font-size: 11px;
+    color: #585b70;
+    letter-spacing: 1px;
 }
 
 #StatusDot {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 #StatusLabel {
-    font-size: 14px;
-    font-weight: bold;
-    color: #a6adc8;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6c7086;
+    letter-spacing: 1px;
 }
 
-/* Window Controls */
-/* Window Controls */
+/* ─── Window Controls ───────────────────────────── */
 #BtnWinMin {
     background-color: transparent;
     border: none;
-    color: #89b4fa; /* Blue */
+    color: #45475a;
+    font-size: 18px;
     font-weight: 900;
-    font-size: 16px;
+    padding: 0 6px;
 }
-#BtnWinMin:hover {
-    color: #b4befe; /* Lighter Blue */
-}
+#BtnWinMin:hover { color: #89b4fa; }
 
 #BtnWinClose {
     background-color: transparent;
     border: none;
-    color: #f38ba8; /* Red */
+    color: #45475a;
+    font-size: 18px;
     font-weight: 900;
-    font-size: 16px;
+    padding: 0 6px;
 }
-#BtnWinClose:hover {
-    color: #eba0ac; /* Lighter Red */
-}
+#BtnWinClose:hover { color: #f38ba8; }
 
-/* Hero Section */
+/* ─── Hero / Controls ───────────────────────────── */
 #HeroSection {
-    background-color: #11111b;
+    background-color: #0f0f17;
+    border-bottom: 1px solid #1e1e2e;
 }
 
 #BtnScan {
-    background-color: #89b4fa; /* Blue */
-    color: #11111b;
-    font-size: 14px;
-    font-weight: bold;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #89b4fa, stop:1 #74c7ec);
+    color: #0f0f17;
+    font-size: 13px;
+    font-weight: 800;
     border-radius: 8px;
     border: none;
+    letter-spacing: 1px;
 }
 #BtnScan:hover {
-    background-color: #74c7ec; /* Sapphire */
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #74c7ec, stop:1 #89dceb);
 }
+#BtnScan:pressed { background-color: #5a9fd4; }
 
 #BtnPilot {
-    background-color: #1e1e2e;
+    background-color: transparent;
     color: #89b4fa;
-    border: 2px solid #89b4fa;
+    border: 1.5px solid #313244;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 700;
     border-radius: 8px;
+    letter-spacing: 1px;
 }
 #BtnPilot:hover {
-    background-color: #89b4fa;
-    color: #1e1e2e;
+    background-color: #1e1e2e;
+    border-color: #89b4fa;
+}
+#BtnPilot:checked {
+    background-color: #f38ba8;
+    color: #0f0f17;
+    border-color: #f38ba8;
 }
 
 #ModeSelect {
-    background-color: #1e1e2e;
-    color: #cdd6f4;
-    border: 2px solid #313244;
-    padding: 5px 10px;
+    background-color: #1a1a28;
+    color: #a6adc8;
+    border: 1.5px solid #313244;
+    padding: 4px 10px;
     border-radius: 8px;
-    font-weight: bold;
+    font-weight: 600;
 }
+#ModeSelect:hover { border-color: #585b70; }
 #ModeSelect::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;
-    width: 30px;
-    border-left-width: 0px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    width: 28px;
+    border: none;
 }
 #ModeSelect::down-arrow {
     image: none;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 5px solid #89b4fa; /* Blue Arrow */
-    margin-right: 5px;
+    border-top: 5px solid #585b70;
+    margin-right: 8px;
 }
 #ModeSelect QAbstractItemView {
-    background-color: #181825;
+    background-color: #1a1a28;
     color: #cdd6f4;
     selection-background-color: #313244;
     selection-color: #cdd6f4;
     border: 1px solid #313244;
+    border-radius: 6px;
+    padding: 4px;
 }
 
-/* Content */
-#SectionTitle {
-    font-size: 16px;
-    font-weight: 600;
-    color: #bac2de;
-    margin-bottom: 10px;
-}
-
-#BtnUndo {
-    background-color: transparent;
-    color: #fab387; /* Peach */
-    border: 1px solid #fab387;
-    border-radius: 4px;
-    font-weight: bold;
-}
-#BtnUndo:hover {
-    background-color: #fab387;
-    color: #11111b;
-}
-
-/* Table */
-QTableWidget {
-    background-color: #1e1e2e;
-    border: none;
-    border-radius: 10px;
-    gridline-color: transparent;
-}
-QTableWidget::item {
-    padding-left: 10px;
-    border-bottom: 1px solid #313244;
-}
-QHeaderView::section {
-    background-color: #1e1e2e;
-    color: #6c7086;
-    border: none;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 12px;
-    padding: 10px;
-}
-
-/* Action Buttons */
-#BtnApprove {
-    background-color: #313244;
-    color: #a6e3a1; /* Green */
-    border-radius: 20px;
-    font-size: 18px;
-    border: 2px solid #a6e3a1;
-}
-#BtnApprove:hover {
-    background-color: #a6e3a1;
-    color: #11111b;
-}
-
-#BtnReject {
-    background-color: #313244;
-    color: #f38ba8; /* Red */
-    border-radius: 20px;
-    font-size: 18px;
-    border: 2px solid #f38ba8;
-}
-#BtnReject:hover {
-    background-color: #f38ba8;
-    color: #11111b;
-}
-
-/* Footer / Logs */
-#Footer {
-    background-color: #11111b;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-}
-
-#BtnToggleLogs {
-    background-color: transparent;
-    color: #585b70;
-    border: none;
-}
-#BtnToggleLogs:hover {
-    color: #cdd6f4;
-}
-
-#Console {
-    background-color: #181825;
-    border: 1px solid #313244;
-    border-radius: 5px;
-    color: #a6adc8;
-    font-family: 'Consolas', monospace;
-    font-size: 11px;
-}
-
-/* Toggles Section */
+/* ─── Toggles ───────────────────────────────────── */
 #TogglesSection {
     background-color: transparent;
+    border-bottom: 1px solid #1e1e2e;
 }
 
 QCheckBox {
     spacing: 8px;
-    color: #a6adc8; /* Subtext0 */
-    font-size: 13px;
+    color: #6c7086;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
+QCheckBox:hover { color: #a6adc8; }
 
 QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 4px;
-    background-color: #313244;
-    border: 1px solid #45475a;
+    background-color: #1e1e2e;
+    border: 1.5px solid #313244;
 }
-
+QCheckBox::indicator:hover { border-color: #585b70; }
 QCheckBox::indicator:checked {
-    background-color: #cba6f7; /* Mauve */
-    border: 1px solid #cba6f7;
+    background-color: #cba6f7;
+    border-color: #cba6f7;
+    image: none;
 }
 
-QCheckBox::indicator:hover {
-    border: 1px solid #585b70;
+/* ─── Content ───────────────────────────────────── */
+#SectionTitle {
+    font-size: 11px;
+    font-weight: 700;
+    color: #45475a;
+    letter-spacing: 2px;
 }
 
-QCheckBox:hover {
+#BtnUndo {
+    background-color: transparent;
+    color: #45475a;
+    border: 1px solid #313244;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+}
+#BtnUndo:hover {
+    color: #fab387;
+    border-color: #fab387;
+}
+
+/* ─── Table ─────────────────────────────────────── */
+QTableWidget {
+    background-color: #13131f;
+    alternate-background-color: #16161f;
+    border: 1px solid #1e1e2e;
+    border-radius: 10px;
+    gridline-color: transparent;
+    outline: none;
     color: #cdd6f4;
+}
+
+QTableWidget::item {
+    background-color: #13131f;
+    color: #cdd6f4;
+    padding: 0 12px;
+    border-bottom: 1px solid #1e1e2e;
+    border-right: none;
+}
+
+QTableWidget::item:alternate {
+    background-color: #16161f;
+    color: #cdd6f4;
+}
+
+QTableWidget::item:selected {
+    background-color: #2a2a3d;
+    color: #cdd6f4;
+}
+
+QHeaderView {
+    background-color: transparent;
+}
+
+QHeaderView::section {
+    background-color: #13131f;
+    color: #45475a;
+    border: none;
+    border-bottom: 1px solid #1e1e2e;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 10px 12px;
+    text-transform: uppercase;
+}
+
+QHeaderView::section:hover {
+    color: #6c7086;
+    background-color: #1a1a28;
+}
+
+QScrollBar:vertical {
+    background: #13131f;
+    width: 6px;
+    border-radius: 3px;
+}
+QScrollBar::handle:vertical {
+    background: #313244;
+    border-radius: 3px;
+    min-height: 30px;
+}
+QScrollBar::handle:vertical:hover { background: #45475a; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+
+/* ─── Action Buttons (in table) ─────────────────── */
+#BtnApprove {
+    background-color: #1e1e2e;
+    color: #a6e3a1;
+    border-radius: 18px;
+    font-size: 16px;
+    border: 1.5px solid #2a3b2a;
+}
+#BtnApprove:hover {
+    background-color: #a6e3a1;
+    color: #0f0f17;
+    border-color: #a6e3a1;
+}
+
+#BtnReject {
+    background-color: #1e1e2e;
+    color: #f38ba8;
+    border-radius: 18px;
+    font-size: 16px;
+    border: 1.5px solid #3b1e2a;
+}
+#BtnReject:hover {
+    background-color: #f38ba8;
+    color: #0f0f17;
+    border-color: #f38ba8;
+}
+
+/* ─── Footer / Logs ─────────────────────────────── */
+#Footer {
+    background-color: #0f0f17;
+    border-top: 1px solid #1e1e2e;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+#BtnToggleLogs {
+    background-color: transparent;
+    color: #313244;
+    border: none;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+#BtnToggleLogs:hover { color: #585b70; }
+
+#LogBox {
+    background-color: #0f0f17;
+}
+
+#Console {
+    background-color: #0d0d14;
+    border: 1px solid #1e1e2e;
+    border-radius: 6px;
+    color: #585b70;
+    font-family: 'Consolas', 'JetBrains Mono', monospace;
+    font-size: 11px;
+}
+
+QListWidget#Console::item {
+    background-color: transparent;
+    color: #585b70;
+    border: none;
+    padding: 1px 4px;
+}
+
+/* ─── AI Engine Section ─────────────────────────── */
+#AISection {
+    background-color: transparent;
+    border-bottom: 1px solid #1a1a28;
+}
+
+#ApiKeyInput {
+    background-color: #1a1a28;
+    color: #a6adc8;
+    border: 1.5px solid #313244;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+}
+#ApiKeyInput:focus {
+    border-color: #cba6f7;
+    color: #cdd6f4;
+}
+#ApiKeyInput::placeholder {
+    color: #45475a;
+}
+
+#BtnDetect {
+    background-color: transparent;
+    color: #585b70;
+    border: 1.5px solid #313244;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+#BtnDetect:hover {
+    color: #a6e3a1;
+    border-color: #a6e3a1;
 }
