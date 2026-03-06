@@ -194,6 +194,16 @@ class Dashboard(QMainWindow):
         self.api_key_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.api_key_input.setFixedHeight(34)
         self.api_key_input.setMinimumWidth(240)
+        
+        # Try to load existing key from secure storage
+        try:
+            import keyring
+            saved_key = keyring.get_password("vortex_desktop", "openai_api_key")
+            if saved_key:
+                self.api_key_input.setText(saved_key)
+        except Exception:
+            pass
+
         self.api_key_input.textChanged.connect(self._emit_ai_config)
 
         # Ollama detect button

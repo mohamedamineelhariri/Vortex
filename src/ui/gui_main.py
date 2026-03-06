@@ -98,8 +98,17 @@ class AntigravityWorker(QObject):
     def update_ai_config(self, ai_cfg):
         self.system.update_config("ai_provider", ai_cfg.get("provider", "openai"))
         self.system.update_config("ai_model",    ai_cfg.get("model", "gpt-4o-mini"))
+        
         if ai_cfg.get("api_key"):
-            self.system.update_config("openai_api_key", ai_cfg["api_key"])
+            key = ai_cfg["api_key"]
+            self.system.update_config("openai_api_key", key)
+            try:
+                import keyring
+                keyring.set_password("vortex_desktop", "openai_api_key", key)
+            except Exception as e:
+                import logging
+                logging.getLogger("antigravity").error(f"Failed to save API key to secure keyring: {e}")
+                
         # Recreate brain client with new settings
         from src.brain_client import BrainClient
         self.system.brain = BrainClient(self.system.config)

@@ -53,7 +53,26 @@ class BrainClient:
         return self.config.get("ai_model", "gpt-4o-mini")
 
     def _get_api_key(self):
-        return self.config.get("openai_api_key", "")
+        import keyring
+        
+        # 1. Try to get securely from OS keyring
+        try:
+            key = keyring.get_password("vortex_desktop", "openai_api_key")
+        except Exception as e:
+            logger.warning(f"Keyring get_password failed: {e}. Falling back to config.")
+            key = None
+        
+        # 2. Fallback to config (if it's a first run before we migrated)
+        if not key:
+            key = self.config.get("openai_api_key", "")
+            # If we found it in config (and it's not the placeholder), secure it now
+            if key and key != "YOUR_API_KEY_HERE":
+                try:
+                    keyring.set_password("vortex_desktop", "openai_api_key", key)
+                except Exception as e:
+                    logger.error(f"Failed to save API key to secure keyring: {e}")
+                
+        return key
 
     def _get_base_url(self):
         provider = self._get_provider()
