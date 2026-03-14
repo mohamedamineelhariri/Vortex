@@ -8,25 +8,26 @@ Vortex is a powerful, intelligent desktop manager that automatically categorizes
 
 ## ✨ Features
 
-*   **🧠 AI Brain**: Uses OpenAI (via n8n) to intelligently understand file content and context, not just extensions.
-*   **🛡️ Suggest Mode**: Reviews changes before they happen. Approve or Reject actions with a click.
-*   **🚀 Auto-Pilot**: Real-time background monitoring. Drop a file, and watch it fly to the right folder instantly.
-*   **⏪ Undo Capability**: Made a mistake? Revert moves instantly with the Undo button.
-*   **🎨 Premium UI**: "Deep Space" dark mode interface built with PyQt6. Frameless, modern design.
-*   **📂 Smart Sorting**: Automatically creates subfolders (e.g., `Documents/Invoices`, `Code/Python`, `Images/Screenshots`).
+*   **🧠 Direct AI Brain**: Connects directly to **OpenAI** (Cloud) or **Ollama** (Local). No middleware like n8n required.
+*   **🔐 Secure Storage**: API keys are stored securely using the **OS Credential Manager** (Windows Credential Locker, macOS Keychain).
+*   **🏢 Multi-Model Support**: Swap between models like `gpt-4o-mini`, `phi-4`, or `qwen2.5` on the fly.
+*   **🛡️ Suggest Mode**: Review AI suggestions before they happen. Approve or Reject actions with a click.
+*   **🚀 Auto-Pilot**: Real-time background monitoring. Drop a file, and watch it categorized instantly.
+*   **📂 Smart Branding**: Shortcuts are "branded" with categories (e.g., `[Gaming]-Discord.lnk`) to keep the desktop organized and searchable.
+*   **⏪ Undo Capability**: Revert any organizational action instantly with a single button.
+*   **🎨 Premium UI**: Modern "Deep Space" dark mode interface built with PyQt6.
 
 ## 🛠️ Tech Stack
 
 *   **Frontend**: Python (PyQt6)
-*   **Backend**: Python (Watchdog, Requests)
-*   **Intelligence**: n8n (Workflow Automation) + OpenAI GPT-4
+*   **Backend**: Python (Watchdog, Keyring)
+*   **Intelligence**: OpenAI API / Ollama (Local LLM)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 *   Python 3.10+
-*   Git
-*   [n8n](https://n8n.io/) (Self-hosted or Cloud)
+*   An OpenAI API Key **OR** [Ollama](https://ollama.com/) installed locally.
 
 ### Installation
 
@@ -41,32 +42,30 @@ Vortex is a powerful, intelligent desktop manager that automatically categorizes
     pip install -r requirements.txt
     ```
 
-3.  **Setup the Brain (n8n)**
-    *   Import `n8n/antigravity_workflow_v6.json` into your n8n instance.
-    *   Configure your OpenAI credentials in the n8n node.
-    *   Activate the workflow.
-    *   Update `config.yaml` with your n8n webhook URL.
-
-4.  **Run VORTEX**
+3.  **Run VORTEX**
     ```bash
     python src/ui/gui_main.py
     ```
 
+4.  **Configuration**
+    *   Enter your **OpenAI API Key** in the UI (it will be saved securely).
+    *   Or switch to **Ollama** and hit the **Detect** button to use local models.
+
 ## 🏭 FabLab / Makerspace Edition
-**Vortex** is capable of running on shared institution machines.
+Vortex includes specialized support for shared institution machines and maker spaces.
 
 ### Features
-*   **CAD/CAM Support**: Recognizes `.stl`, `.obj`, `.dxf`, `.gcode`, `.ino` and more.
-*   **Project Grouping**: Designed for shared users. It attempts to group files into Project folders rather than generic timestamps.
-*   **Setup**: Import `n8n/fablab_workflow_v1.json` for the specialized logic.
+*   **CAD/CAM Support**: Deep recognition for `.stl`, `.obj`, `.dxf`, `.step`, `.gcode`, `.ino` (Arduino), and `.f3d` (Fusion 360).
+*   **Project Grouping**: Automatically groups files by project context rather than just extension.
 
 ## 🎮 Usage
 
 *   **Quick Scan**: Scans existing files on your Desktop/Downloads and queues them for review.
-*   **Auto-Pilot**: Toggles the background watcher. When active (Green), it monitors for *new* files.
-*   **Pending Actions**: Review the AI's suggestions. Click **✔** to approve or **✘** to reject.
-*   **Undo**: Reverses the last file move operation.
+*   **AI Engine**: Use the dashboard panel to swap providers or models without restarting.
+*   **Pending Actions**: Hover over suggestions in the table and click **✔** to approve or **✘** to reject.
+*   **Undo**: Reverses the last file rename or move operation.
 
 ## 📝 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
